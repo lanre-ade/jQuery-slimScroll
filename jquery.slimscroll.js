@@ -559,7 +559,7 @@
             if(val != 0){
               normalizeFactorAry.some(function(_val, _index){
                 if(Math.abs(val / _val) == parseInt(Math.abs(val / _val))){
-                  normalizeFactor = Math.abs(_val);
+                  normalizeFactor = _val;
                   return true;
                 }
               });
