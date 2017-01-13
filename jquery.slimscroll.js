@@ -551,6 +551,35 @@
         // attach scroll events
         attachWheel(this);
 
+        // check normalize factor
+        var normalizeFactor = 1,
+            normalizeFactorAry = [120,100,20,3];
+        function _checkNormalizeFactor(deltaAry){
+          deltaAry.some(function(val, index){
+            if(val != 0){
+              normalizeFactorAry.some(function(_val, _index){
+                if(Math.abs(val / _val) == parseInt(Math.abs(val / _val))){
+                  normalizeFactor = _val;
+                  return true;
+                }
+              });
+            }
+          });
+        }
+
+        // normalize delta
+        function _normalizeDelta(deltaAry){
+          if(normalizeFactor === 1){
+            _checkNormalizeFactor(deltaAry);
+          }
+          deltaAry.some(function(val, index){
+            if(val != 0){
+              deltaAry[index] = val / normalizeFactor;
+            }
+          });
+          return deltaAry;
+        }
+
         function _getDeltaFromEvent(e) {
           var deltaX     = 0;
           var deltaY     = 0;
@@ -581,7 +610,7 @@
             deltaX = e.deltaX;
           }
 
-          return [deltaX, deltaY];
+          return _normalizeDelta([deltaX, deltaY]);
         }
 
         function _onWheel(e)
@@ -626,7 +655,7 @@
             if (isWheel)
             {
               // move bar with mouse wheel
-              deltaX = parseInt(barX.css('left')) + (moveFactor * parseInt(o.wheelStep)/100);
+              deltaX = parseInt(barX.css('left')) + (moveFactor * parseInt(o.wheelStep));
 
               // move bar, make sure it doesn't go out
               deltaX = Math.min(Math.max(deltaX, 0), maxLeft);
@@ -672,7 +701,7 @@
             if (isWheel)
             {
               // move bar with mouse wheel
-              deltaY = parseInt(barY.css('top')) + (y * parseInt(o.wheelStep) /100);
+              deltaY = parseInt(barY.css('top')) + (y * parseInt(o.wheelStep));
 
               // move bar, make sure it doesn't go out
               deltaY = Math.min(Math.max(deltaY, 0), maxTop);
