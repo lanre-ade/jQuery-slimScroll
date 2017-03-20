@@ -94,7 +94,10 @@
         borderRadius: '7px',
 
         // sets border radius of the rail
-        railBorderRadius : '7px'
+        railBorderRadius : '7px', 
+        
+        // while scroll programatically, a flag determine need to trigger the scroll
+        scrollingEventTriggerOnJump : true
       };
 
       var o = $.extend(defaults, options);
@@ -645,17 +648,19 @@
             percentScrollX = parseInt(barX.css('left')) / (me.outerWidth() - barX.outerWidth());
             deltaX = percentScrollX * (me[0].scrollWidth - me.outerWidth());
 
+            var canTrigger = true;
             if (isJump)
             {
               deltaX = x;
               var offsetLeft = deltaX / me[0].scrollWidth * me.outerWidth();
               offsetLeft = Math.min(Math.max(offsetLeft, 0), maxLeft);
               barX.css({ left: offsetLeft + 'px' });
+              canTrigger = o.scrollingEventTriggerOnJump;
             }
 
             // scroll content and fire scrolling event
             me.scrollLeft(deltaX);
-            me.trigger('slimscrollingX', ~~deltaX);
+            canTrigger && me.trigger('slimscrollingX', ~~deltaX);
 
             // ensure bar is visible
             showBarX();
@@ -668,6 +673,11 @@
           if(hasVerticalScrollbar){
             var deltaY = y;
             var maxTop = me.outerHeight() - barY.outerHeight();
+
+            // TODO : mycheck
+            if(hasHorizontalScrollbar && x && !isWheel && !isJump && Math.abs(y) < 40){
+                return;
+            }
 
             if (isWheel)
             {
@@ -691,17 +701,19 @@
             percentScrollY = parseInt(barY.css('top')) / (me.outerHeight() - barY.outerHeight());
             deltaY = percentScrollY * (me[0].scrollHeight - me.outerHeight());
 
+            var canTrigger = true;
             if (isJump)
             {
               deltaY = y;
               var offsetTop = deltaY / me[0].scrollHeight * me.outerHeight();
               offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
               barY.css({ top: offsetTop + 'px' });
+              canTrigger = o.scrollingEventTriggerOnJump;
             }
 
             // scroll content and fire scrolling event
             me.scrollTop(deltaY);
-            me.trigger('slimscrollingY', ~~deltaY);
+            canTrigger && me.trigger('slimscrollingY', ~~deltaY);
 
             // ensure bar is visible
             showBarY();
